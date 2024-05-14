@@ -1,0 +1,17 @@
+/opt/homebrew/opt/portaudio/lib/libportaudio.2.dylib
+/opt/homebrew/opt/gtk+3/lib/libgtk-3.0.dylib
+/opt/homebrew/opt/gtk+3/lib/libgdk-3.0.dylib
+/opt/homebrew/opt/pango/lib/libpangocairo-1.0.0.dylib
+/opt/homebrew/opt/pango/lib/libpango-1.0.0.dylib
+/opt/homebrew/opt/harfbuzz/lib/libharfbuzz.0.dylib
+/opt/homebrew/opt/at-spi2-core/lib/libatk-1.0.0.dylib
+/opt/homebrew/opt/cairo/lib/libcairo-gobject.2.dylib
+/opt/homebrew/opt/cairo/lib/libcairo.2.dylib
+/opt/homebrew/opt/gdk-pixbuf/lib/libgdk_pixbuf-2.0.0.dylib
+/opt/homebrew/opt/glib/lib/libgio-2.0.0.dylib
+/opt/homebrew/opt/glib/lib/libgobject-2.0.0.dylib
+/opt/homebrew/opt/glib/lib/libglib-2.0.0.dylib
+/opt/homebrew/opt/gettext/lib/libintl.8.dylib
+/opt/homebrew/opt/fftw/lib/libfftw3.3.dylib
+
+
