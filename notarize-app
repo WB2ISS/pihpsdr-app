@@ -1,0 +1,49 @@
+
+
+EXECUTABLE = pihpsdr
+VERSION    = 2.3
+MACOS      = macos14
+PROFILE    = "SDR"
+
+APPLICATION = $(EXECUTABLE).app
+
+FOLDER      = $(EXECUTABLE)-$(VERSION)-$(MACOS)
+DMG					= $(FOLDER).dmg
+PKGUNSIGNED = $(FOLDER)-unsigned.pkg
+PKG					= $(FOLDER).pkg
+
+SIGNID			= "Developer ID Application: Transition Technology Ventures, LLC (6V82P5ET42)"
+INSTALLID		= "Developer ID Installer: Transition Technology Ventures, LLC (6V82P5ET42)"
+
+INSTALL 		= /Applications
+
+dmg:
+
+						mkdir $(FOLDER)-dmg
+						cp -r $(APPLICATION) $(FOLDER)-dmg
+						hdiutil create -fs HFS+ -srcfolder $(FOLDER)-dmg -volname $(FOLDER) $(DMG)
+						codesign -vf --timestamp  --options runtime --sign $(SIGNID) $(DMG)
+						codesign --verify --verbose $(DMG)
+						xcrun notarytool submit $(DMG) --keychain-profile $(PROFILE) --wait
+						spctl -a -t open --context context:primary-signature -v $(DMG)
+						xcrun stapler staple  xcrun stapler $(DMG)
+						xcrun stapler validate $(DMG)
+
+pkg:
+
+						mkdir $(FOLDER)-pkg
+						cp -r $(APPLICATION)	$(FOLDER)-pkg
+						pkgbuild --root $(FOLDER)-pkg \
+										--component-plist component.plist \
+								 		--identifier $(EXECUTABLE) \
+						 		 		--install-location $(INSTALL) \
+						 		 		--sign $(INSTALLID) \
+						 		 		$(PKGUNSIGNED)
+						productbuild --sign $(INSTALLID) \
+										--package $(PKGUNSIGNED) $(INSTALL) \
+										$(PKG)
+						pkgutil --check-signature $(PKG)
+						xcrun notarytool submit $(PKG) --keychain-profile $(PROFILE) --wait
+						xcrun stapler staple $(PKG)
+						xcrun stapler validate $(PKG)
+						spctl --assess --verbose --type install $(PKG)
