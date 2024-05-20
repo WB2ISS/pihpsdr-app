@@ -39,12 +39,16 @@ LIBSHORT=\
 SIGNID="Developer ID Application: Transition Technology Ventures, LLC (6V82P5ET42)"
 DSTDIR=pihpsdr.app/Contents/Frameworks/
 
+APPLICATION=pihpsdr.app
+EXECUTABLE=pihpsdr.app/Contents/MacOS/pihpsdr
+ENTITLEMENTS=entitlements.plist
+
 xattr -cr pihpsdr.app
 
 echo "----- Fix Executable Code Signature"
 
 codesign --remove-signature pihpsdr.app/Contents/MacOS/pihpsdr
-codesign -vf --timestamp --options runtime --sign "$SIGNID" pihpsdr.app/Contents/MacOS/pihpsdr
+codesign -vf --timestamp --options runtime --sign "$SIGNID" --entitlements $ENTITLEMENTS $EXECUTABLE
 
 echo "---------  Fix Library Code Signatures"
 
@@ -61,4 +65,4 @@ echo "----- Fix App Code Signature"
 echo "app remove"
 codesign --remove-signature pihpsdr.app
 echo "app sign"
-codesign -vf --timestamp --options runtime --sign "$SIGNID" pihpsdr.app
+codesign -vf --timestamp --options runtime --sign "$SIGNID" --entitlements $ENTITLEMENTS $APPLICATION
