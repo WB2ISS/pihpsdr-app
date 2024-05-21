@@ -18,7 +18,6 @@ INSTALLID		= "Developer ID Installer: Transition Technology Ventures, LLC (6V82P
 INSTALL 		= /Applications
 
 dmg:
-						./codesign-app.sh
 						mkdir $(FOLDER)-dmg
 						cp -r $(APPLICATION) $(FOLDER)-dmg
 						hdiutil create -fs HFS+ -srcfolder $(FOLDER)-dmg -volname $(FOLDER) $(DMG)
@@ -30,9 +29,9 @@ dmg:
 						xcrun stapler validate $(DMG)
 
 pkg:
-						./codesign-app.sh
 						mkdir $(FOLDER)-pkg
 						cp -r $(APPLICATION)	$(FOLDER)-pkg
+						chmod -R 755 $(FOLDER)-pkg
 						pkgbuild --root $(FOLDER)-pkg \
 										--component-plist component.plist \
 								 		--identifier $(EXECUTABLE) \
@@ -50,4 +49,4 @@ pkg:
 
 clean:
 
-					rm -rf *-dmg, *.dmg, *-pkg, *.pkg
+					rm -rf *-dmg *.dmg *-pkg *.pkg

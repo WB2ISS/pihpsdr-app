@@ -37,32 +37,27 @@ LIBSHORT=\
 'libxcb.1.dylib')
 
 SIGNID="Developer ID Application: Transition Technology Ventures, LLC (6V82P5ET42)"
-DSTDIR=pihpsdr.app/Contents/Frameworks/
+DSTDIR=pihpsdr.app/Contents/Frameworks
 
 APPLICATION=pihpsdr.app
 EXECUTABLE=pihpsdr.app/Contents/MacOS/pihpsdr
 ENTITLEMENTS=entitlements.plist
 
-xattr -cr pihpsdr.app
+sudo xattr -cr pihpsdr.app
 
-echo "----- Fix Executable Code Signature"
+echo "----- Code Sign Executable"
 
-codesign --remove-signature pihpsdr.app/Contents/MacOS/pihpsdr
 codesign -vf --timestamp --options runtime --sign "$SIGNID" --entitlements $ENTITLEMENTS $EXECUTABLE
 
-echo "---------  Fix Library Code Signatures"
+echo "---------  Code Sign Libraries"
 
 for library in ${LIBSHORT[*]}
 do
   echo $library
-  codesign --remove-signature $DSTDIR/$library
   codesign -vf --timestamp --options runtime --sign "$SIGNID" $DSTDIR/$library
 done
 
 
-echo "----- Fix App Code Signature"
+echo "----- Code Sign App"
 
-echo "app remove"
-codesign --remove-signature pihpsdr.app
-echo "app sign"
 codesign -vf --timestamp --options runtime --sign "$SIGNID" --entitlements $ENTITLEMENTS $APPLICATION

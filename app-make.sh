@@ -4,12 +4,9 @@ EXECUTABLE=pihpsdr
 SRCAPPDIR=../pihpsdr-dl1ycf
 
 APPLICATION=$EXECUTABLE.app
-SRCCONTENTS=$SRCAPPDIR/${APPLICATION}/Contents
 FRAMEWORKS=$APPLICATION/Contents/Frameworks
 MACOS=$APPLICATION/Contents/MacOS
-RPATH=@executable_path/../Frameworks
-
-APPBUNDLE=("Info.plist" "PkgInfo" "Resources")
+EXECUTABLEPATH=@executable_path/../Frameworks
 
 LIBLONG=\
 ('/opt/homebrew/Cellar/cairo/1.18.0/lib/libcairo.2.dylib' \
@@ -98,35 +95,31 @@ do
   ls -l $library
 done
 
-mkdir -p $FRAMEWORKS
-mkdir -p $MACOS
+cp -rp $SRCAPPDIR/$APPLICATION .
 
-cp $EXECUTABLE $MACOS
-for appbundle in ${APPBUNDLE[*]}
-do
-  cp -r p $SRCCONTENTS/$appbundle $APPLICATION/Contents
-done
-
-echo "------ Before change:"
+echo "------ Executable before change:"
 otool -l $MACOS/$EXECUTABLE | grep brew
 
+echo "------ Changing executable"
 for library in ${LIBLONG[*]}
 do
   install_name_tool -change $library @rpath/$(basename $library) $MACOS/$EXECUTABLE
 done
 
-echo "------ After change:"
+echo "------ Executable after change:"
 otool -L $MACOS/$EXECUTABLE | grep rpath
 
-install_name_tool -add_rpath $RPATH $MACOS/$EXECUTABLE
-echo "------ New rpath:"
+echo "------ Adding @rpath to executable"
+install_name_tool -add_rpath $EXECUTABLEPATH $MACOS/$EXECUTABLE
+
+echo "------ New @rpath:"
 otool -l $MACOS/$EXECUTABLE |grep -A4 LC_RPATH
 
 echo "--- Copying Libraries and Setting Install Name"
 for library in ${LIBLONG[*]}
 do
-  cp $library $FRAMEWORKS
-  install_name_tool -id @rpath/$(basename $library) $FRAMEWORKS/$(basename $library)
+  cp -f $library $FRAMEWORKS
+  install_name_tool -id @rpath/$(basename $library) $FRAMEWORKS/$(basename $library) 2>/dev/null
   otool -D $FRAMEWORKS/$(basename $library)
 done
 
