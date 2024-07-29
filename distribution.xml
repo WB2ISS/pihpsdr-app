@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<installer-gui-script minSpecVersion="1">
+    <pkg-ref id="pihpsdr"/>
+    <readme file="pihpsdr-license.rtf" mime-type="application/rtf"/>
+    <options customize="never" require-scripts="false" hostArchitectures="x86_64,arm64"/>
+    <choices-outline>
+        <line choice="default">
+            <line choice="pihpsdr"/>
+        </line>
+    </choices-outline>
+    <choice id="default"/>
+    <choice id="pihpsdr" visible="false">
+        <pkg-ref id="pihpsdr"/>
+    </choice>
+    <pkg-ref id="pihpsdr" version="0" onConclusion="none">pihpsdr-2.3-macos14-L.pkg</pkg-ref>
+</installer-gui-script>

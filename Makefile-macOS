@@ -1,25 +1,42 @@
+####    Makefile-macOS
+###
+###
+#
+#	cd <xxxxx>/pihpsdr-app
+# copy pihpsdr.app into <xxxxx>/pihpsdr-app f
+# ./app-codesign.sh
+# rm -rf build
+# mkdir build
+# cd build
+# make -f ../Makefile-macOS all
 
+EXECUTABLE 			= pihpsdr
+VERSION    			= 2.3
+MACOS      			= macos14
+PROFILE    			= "SDR"
 
-EXECUTABLE = pihpsdr
-VERSION    = 2.3
-MACOS      = macos14
-PROFILE    = "SDR"
+SRCDIR					= ..
+APPLICATIONDIR	= ..
+APPLICATION			= $(APPLICATIONDIR)/$(EXECUTABLE).app
+PLIST						= $(APPLICATIONDIR)/component.plist
+LICENSEDIR			= ..
+LICENSE         = $(LICENSEDIR)/$(EXECUTABLE)-license.rtf
+DISTRIBUTION    = $(LICENSEDIR)/distribution.xml
+INSTALL 				= /Applications
 
-APPLICATION = $(EXECUTABLE).app
+SIGNID					= "Developer ID Application: Transition Technology Ventures, LLC (6V82P5ET42)"
+INSTALLID				= "Developer ID Installer: Transition Technology Ventures, LLC (6V82P5ET42)"
 
-FOLDER      = $(EXECUTABLE)-$(VERSION)-$(MACOS)
-DMG					= $(FOLDER).dmg
-PKGUNSIGNED = $(FOLDER)-unsigned.pkg
-PKG					= $(FOLDER).pkg
+FOLDER      		= $(EXECUTABLE)-$(VERSION)-$(MACOS)
+DMG							= $(FOLDER).dmg
+PKG							= $(FOLDER).pkg
+PKGL						= $(FOLDER)-L.pkg
 
-SIGNID			= "Developer ID Application: Transition Technology Ventures, LLC (6V82P5ET42)"
-INSTALLID		= "Developer ID Installer: Transition Technology Ventures, LLC (6V82P5ET42)"
-
-INSTALL 		= /Applications
 
 dmg:
 						mkdir $(FOLDER)-dmg
 						cp -r $(APPLICATION) $(FOLDER)-dmg
+						cp $(LICENSE) $(FOLDER)-dmg
 						hdiutil create -fs HFS+ -srcfolder $(FOLDER)-dmg -volname $(FOLDER) $(DMG)
 						codesign -vf --timestamp  --options runtime --sign $(SIGNID) $(DMG)
 						codesign --verify --verbose $(DMG)
@@ -33,20 +50,27 @@ pkg:
 						cp -r $(APPLICATION)	$(FOLDER)-pkg
 						chmod -R 755 $(FOLDER)-pkg
 						pkgbuild --root $(FOLDER)-pkg \
-										--component-plist component.plist \
+										--component-plist $(PLIST) \
 								 		--identifier $(EXECUTABLE) \
 						 		 		--install-location $(INSTALL) \
 						 		 		--sign $(INSTALLID) \
-						 		 		$(PKGUNSIGNED)
-						productbuild --sign $(INSTALLID) \
-										--package $(PKGUNSIGNED) $(INSTALL) \
+						 		 		$(PKGL)
+
+						productbuild --distribution $(DISTRIBUTION) \
+										--resources $(SRCDIR) \
+										--sign $(INSTALLID) \
+										--package-path $(PKGL) \
 										$(PKG)
+
 						pkgutil --check-signature $(PKG)
 						xcrun notarytool submit $(PKG) --keychain-profile $(PROFILE) --wait
 						xcrun stapler staple $(PKG)
 						xcrun stapler validate $(PKG)
 						spctl --assess --verbose --type install $(PKG)
 
+
+all:					dmg pkg
+
 clean:
 
-					rm -rf *-dmg *.dmg *-pkg *.pkg
+						rm -rf $(EXECUTABLE) $(EXECUTABLE)-x86_64 $(EXECUTABLE)-arm64 $(FOLDER)-dmg $(DMG) $(FOLDER)-pkg $(PKGL) $(PKG)
