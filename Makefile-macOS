@@ -8,7 +8,7 @@
 # rm -rf build
 # mkdir build
 # cd build
-# make -f ../Makefile-macOS all
+# make -f ../Makefile-macOS [dmg|pkg|all|clean]
 
 EXECUTABLE 			= pihpsdr
 VERSION    			= 2.3
